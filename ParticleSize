@@ -1,4 +1,4 @@
-L=[1,2,3,4,5,6,7] # Positions of Maxima
+L=[430,449,469,490,514,544,579,620,665] # Positions of Maxima
 
 def Calcd(l1,l2):
     l1=float(l1)
@@ -9,7 +9,7 @@ def Calcd(l1,l2):
 
 D=[] #Diameter in 1E-6m
 for n in range(len(L)-1):
-    D.append(Calcd(L[n],L[n+1])/1000)
+    D.append(round(Calcd(L[n],L[n+1])/1000,2))
 
 print(D)
 
