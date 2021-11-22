@@ -1,14 +1,16 @@
+import os
+import glob
+
 l1=float(531)
 l2=float(580)
 
-if not 'l1' in locals():
+def Calcd():
     l1=float(input('l1='))
-if not 'l2' in locals():
     l2=float(input('l2='))
+    n=l2/(l2-l1)
+    d=n*l2
+    return d
 
-n=l2/(l2-l1)
-d=n*l2
+def osTest():
+    os.listdir()
 
-print(str(round(d/1000,2))+' um')
-
-test={}
