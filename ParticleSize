@@ -13,7 +13,6 @@ D=[] #Diameter in 1E-6m
 for n in range(len(L)-1):
     D.append(round(Calcd(L[n],L[n+1])/1000,2))
 
-D.append(0)
 N=0
 for i in D:
     N=N+i
@@ -21,5 +20,5 @@ avg=N/len(D)
 
 D.append(avg)
 
-np.savetxt('Particle Sizes.txt',D,fmt='%1.2f')
+np.savetxt('Particle Sizes.txt',D,fmt='%1.2f',header='Particle Sizes in Mycrometer. Last one is Average.')
 
