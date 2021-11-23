@@ -1,3 +1,5 @@
+import numpy as np
+
 L=[430,449,469,490,514,544,579,620,665] # Positions of Maxima
 
 def Calcd(l1,l2):
@@ -11,5 +13,13 @@ D=[] #Diameter in 1E-6m
 for n in range(len(L)-1):
     D.append(round(Calcd(L[n],L[n+1])/1000,2))
 
-print(D)
+D.append(0)
+N=0
+for i in D:
+    N=N+i
+avg=N/len(D)
+
+D.append(avg)
+
+np.savetxt('Particle Sizes.txt',D,fmt='%1.2f')
 
