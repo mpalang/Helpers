@@ -91,54 +91,51 @@ def getSRSData(f,M_No=300, No_Avg=200, MakeDiffSpecs=False,t_all=[],output_suffi
     Data={'Wn': Wn, 'time': time, 'spectra': spectra, 'info': info, 'Spec_Pts': Spec_Pts, 's_count': s_count, 'Bg': bg}
     return Data
             
-def srsTreatData(Data,M_No=300, No_Avg=200, MakeDiffSpecs=False,t_all=[],output_suffix='_converted'): #in: header, data, Wn, spectra_counter, Spec_Pts, t
+def srsTreatData(Data,Settings): #in: header, data, Wn, spectra_counter, Spec_Pts, t
        
-        Wn=Data['Wn']
-        time=Data['time']
-        time=[x.round(2) for x in time] # Runde Zeit in Minuten auf 2 Nachkommastellen.
-        spectra=Data['spectra']
-        
-        spectra_counter=Data['s_count']
-        Spec_Pts=Data['Spec_Pts']
-        t_all=t_all
-        bg=Data['Bg']
-                
+    Wn=Data['Wn']
+    time=Data['time']
+    time=[x.round(2) for x in time] # Runde Zeit in Minuten auf 2 Nachkommastellen.
+    spectra=Data['spectra']
+    
+    spectra_counter=Data['s_count']
+    Spec_Pts=Data['Spec_Pts']
+    bg=Data['Bg']
+            
+    spectra=[x/100 for x in spectra] #data is saved as 'R' (0-100). (0-1) is needed.]
+    #spectra_rec=[1/x for x in spectra]
+    spectra_log=[np.log10(1/x) for x in spectra] #log(1/R)
+    
+    Spectra={'Wn': Wn, 'time': time, 'spectra': spectra, 'spectra_log': spectra_log, 'Bg': bg}
+    
+    if Settings['MakeDiffSpecs']:
+        Spectra['diffspecs_log']=[]   
         t=[0]
-        for j in t_all:
+        for j in Data['t_all']:
             for i in range(spectra_counter):
                 if time[i]-1<j<time[i]+1:
                     t.append(i)
                     break
 
-        
-
-        
-        spectra=[x/100 for x in spectra] #data is saved as 'R' (0-100). (0-1) is needed.]
-        #spectra_rec=[1/x for x in spectra]
-        spectra_log=[np.log10(1/x) for x in spectra] #log(1/R)
-
-        diffspecs_log=[]        
-        n=0
         for td in t:
-            diffspecs_log.append([x-spectra_log[td] for x in spectra_log])
-        
-        Spectra={'Wn': Wn, 'time': time, 'spectra': spectra, 'spectra_log': spectra_log, 'diffspecs_log': diffspecs_log, 'Bg': bg}
-        
-        return  Spectra
-
-def srsSaveData(fn, Settings, Spectra):
+            Spectra['diffspecs_log'].append([x-spectra_log[td] for x in spectra_log])
     
-    outputdir=Settings[4] + Settings[5]
-    if not path.exists(outputdir):
-        os.makedirs(outputdir)
-        
+    return  Spectra
+
+def srsSaveData(f,Spectra, Settings):
+
+    
+    sn=Path(Path(f).parent,'CSV_Data',Path(f).name.replace('.srs',''))
+
+    print('savename: '+str(sn))  
     Wn=Spectra['Wn']
     time=[x.round(2) for x in Spectra['time']]
     time.insert(0,0)
     time=np.array(time)
     spectra=Spectra['spectra']
     spectra_log=Spectra['spectra_log']
-    diffspecs_log=Spectra['diffspecs_log']
+    if Settings['MakeDiffSpecs']:
+        diffspecs_log=Spectra['diffspecs_log']
     
     spectra_m=np.array(Wn)
     for i in spectra:
@@ -150,36 +147,39 @@ def srsSaveData(fn, Settings, Spectra):
         spectra_log_m=np.column_stack((spectra_log_m,i))
     spectra_log_m=np.vstack((time,spectra_log_m))
     
-    s = open(outputdir + '/' + fn.removesuffix('.srs')+ '_Spectra.txt', 'w')
-    np.savetxt(s,spectra_m)
+    s = open(sn+'_Spectra.csv', 'w')
+    np.savetxt(s,spectra_m, delimiter=',')
     s.close()
 
-    s = open(outputdir + '/' + fn.removesuffix('.srs')+'_Spectra_log.txt', 'w')
-    np.savetxt(s, spectra_log_m)
+    s = open(sn+'_Spectra_log.txt', 'w')
+    np.savetxt(s, spectra_log_m, delimiter=',')
     s.close()
     
-    n=1
-    for ds in diffspecs_log:
-        ds_m=np.array(Wn)
-        for i in ds:
-            ds_m=np.column_stack((ds_m,i))
-        ds_m=np.vstack((time,ds_m))  
-        
-        s = open(outputdir + '/' + fn.removesuffix('.srs')+'_Diffspec_'+ str(n) +'_log.txt', 'w')
-        np.savetxt(s, ds_m)
-        s.close()
-        n=n+1
+    if Settings['MakeDiffSpecs']:
+        n=1
+        for ds in diffspecs_log:
+            ds_m=np.array(Wn)
+            for i in ds:
+                ds_m=np.column_stack((ds_m,i))
+            ds_m=np.vstack((time,ds_m))  
+            
+            s = open(sn+'_Diffspec_'+ str(n) +'_log.txt', 'w')
+            np.savetxt(s, ds_m, delimiter=',')
+            s.close()
+            n=n+1
     
 
 #%% Run Code
 
 Settings=getFileList(Settings)
 Data={}
+Spectra={}
 for f in Settings['filelist']:
-    Data[Path(f).name.replace('.srs','')]=getSRSData(f,Settings)
+    Data=getSRSData(f,Settings)
+    Spectra=srsTreatData(Data,Settings)
+    for key in Spectra.keys():
+        print(len(Spectra[key]))
+    print(len(Data['spectra']))
+    #srsSaveData(f,Spectra, Settings)
 
-for dkey in Data.keys():
-    Spectra[dkey]=srsTreatData(Data[dkey],**Settings)
 
-print(Data.keys())
-print(Spetra.keys())
