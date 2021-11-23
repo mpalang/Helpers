@@ -1,10 +1,9 @@
 import os,glob
 from pathlib import Path
+import numpy as np
 import matplotlib.pyplot as plt
 
 
-parent_directory=Path(__file__).parent
-Liste=glob.glob(str(Path(parent_directory,'*.srs')))
-#print(Path(parent_directory+'*srs'))
-print(parent_directory)
-print(Liste)
+string='test.srs'
+string=string.replace('.srs','')
+print(string)
