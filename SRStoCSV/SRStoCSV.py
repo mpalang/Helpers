@@ -1,4 +1,4 @@
-#This little program taks .srs files from ThermoFisher's Omnic and converts it into an easily readable .csv file.
+
 
  # -*- coding: utf-8 -*-
 """
@@ -6,9 +6,16 @@ Created on Wed Jun 23 11:08:40 2021
 
 @author: Moritz Lang
 """
-import os, glob
+#This little program takes .srs files from Thermo Fisher's Omnic and converts it into an easily readable .csv file.
+
+
+
+import os
+import glob
 import numpy as np
 from pathlib import Path
+import logging
+logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.WARNING)
 #import warnings
 #warnings.filterwarnings("ignore")
 
