@@ -15,9 +15,13 @@ import glob
 import numpy as np
 from pathlib import Path
 import logging
-logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.WARNING)
-#import warnings
-#warnings.filterwarnings("ignore")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        #logging.FileHandler("Logging.log"),
+        logging.StreamHandler(sys.stdout)
+    ])
 
 Settings={  
 
@@ -25,20 +29,18 @@ Settings={
 # srs File:    
 # Can be String or List of Strings. Leave empty if all .srs files shall be converted from folder.
 
-'filename': '', #output_filename='_Converted' # will be attached to the input filename and has to be added to the getSRSData Function.
+    'filename': '', #output_filename='_Converted' # will be attached to the input filename and has to be added to the getSRSData Function.
 
 # Maximum number of collected spectra. (in case stopping condition doesnt work). Average Number for one measurement.
-'M_No': 300,
-'No_Avg': 200,
+    'M_No': 300,
+    'No_Avg': 200,
 
 # add as many times for Diffspectra as you want. 
-'MakeDiffSpecs': False,
-'t_all': [19,104,149]
+    'MakeDiffSpecs': False,
+    't_all': [19,104,149]
 
 #<-- up to here.
 }
-
-
 
 #%% Define Functions:
 ####
