@@ -4,6 +4,4 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-string='test.srs'
-string=string.replace('.srs','')
-print(string)
+This is a test
